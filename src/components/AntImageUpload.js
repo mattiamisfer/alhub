@@ -88,13 +88,14 @@ handleDelete =(id) => {
             return;
         }
         if (info.file.status === 'done') {
-            console.log('info', info.file.response.imageId);
+            console.log('info...', info.file.response.imageId);
             if (this.props.multiple) {
                 let value = this.props.value;
                 this.props.onChange(value === "" ? info.file.response.imageId : value + ","+info.file.response.imageId)
             }else{
-                alert(info.file.response.imageId)
-                this.props.onChange(info.file.response.imageId)
+                //alert(info.file.response.imageId)
+               this.props.onChange(info.file.response.imageId)
+//this.props.handleInputServiceChange(info.file.response.imageId)
             }
             
             // Get this url from response in real world.
@@ -212,7 +213,7 @@ handleDelete =(id) => {
                         {
                             this.props.multiple ===false && this.props.value && this.props.single === true? 
                             <>
-                            {this.props.image}
+                        
                             
                             <img width={150} src={process.env.REACT_APP_API_URL + "static/Images/Store/" +this.props.image}/>
                             </>

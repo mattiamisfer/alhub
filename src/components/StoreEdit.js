@@ -17,7 +17,10 @@ const StoreEdit = () => {
     const [store,setStore] =useState();
     const [image,setImage] = useState();
     const [service,setService] = useState([])
-    const [updateService,setUpdateService] = useState({name:'',charge:''});
+    const [updateService,setUpdateService] = useState([{id:'',name:'',charge:'', image: {
+        filename: "",
+        destination: ""
+      }}]);
     const { register, handleSubmit, watch, control, setValue, formState: { errors } } = useForm();
     const params = useParams();
 
@@ -64,7 +67,9 @@ const StoreEdit = () => {
                     console.log('banners'+ JSON.stringify(response.data.data[0].bannerImages))
                     setValue("images", [process.env.REACT_APP_API_URL + "static/Images/Store/" + response.data.data[0].filename])
                     setValue("keywords", response.data.data[0].keywords.split(","))
-                  // setValue("services", response.data.data[0].services);
+                 setValue("services", response.data.data[0].services);
+
+                 setUpdateService(response.data.data[0].services)
                     setService(response.data.data[0].services)
                     setValue("id",params.id);
 
@@ -75,13 +80,40 @@ const StoreEdit = () => {
             //window.reload();
     }, []);
 
-
-    const handleInputService = event => {
-        const { name, value } = event.target;
-
-        alert(name);
+    const handleInputServiceChange = index => e => {
+        ///const { name, value } = event.target;
+      //  alert(name + value)
        // setTutorial({ ...tutorial, [name]: value });
+       let newArr = [...updateService]; // copying the old datas array
+       newArr[index] = e.target.value; // replace e.target.value with whatever you want to change it to
+     
+       setUpdateService(newArr);
+      //  alert(JSON.stringify(newArr));
+       
       };
+
+      const saveService =(id) => {
+
+        alert(JSON.stringify(id))
+
+      }
+    
+
+      const handleDelete =(id) => {
+          //alert(id);
+          console.log('iiiii ',id);
+        axios.post(process.env.REACT_APP_API_URL + 'api/store/delete-service', {id})
+            .then(function (response) {
+                if (response.status == 200) {
+                    console.log('=======response.data========', response.data);
+                    // update(response.data.data)
+                    toast.success('Deleted!');
+                    window.location.reload(false);
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
+      }
 
     const handleStoreEdit = (data) => {
 
@@ -100,7 +132,7 @@ const StoreEdit = () => {
 
 //alert(setValue('banner')
 
-alert(JSON.stringify(data))
+//alert(JSON.stringify(data))
 
        console.log('dddd ', JSON.stringify(data));
         axios({ method: 'POST', url: process.env.REACT_APP_API_URL + 'api/store/update', data })
@@ -485,89 +517,7 @@ alert(JSON.stringify(data))
 
 
                 </Grid>
-                <Grid container spacing={3}>
-                    
-                {service.map((x, i) => {
-                        return <>
-                            <Grid item xs={12} sm={5} key={x.id}>
-                                
-                                <Controller
-                                    control={control}
-                                    name={`services.${i}.name`}
-                                    defaultValue={x.name}
-                                    render={({ field: { onChange, onBlur, value, ref } }) => (
-                                        <>
-
-                                            <TextField
-                                                InputLabelProps={{ shrink: true }}
-                                                // id="name"
-                                                // name="name"
-                                                label="Name"
-                                                fullWidth
-                                                onChange={handleInputService}
-                                                value={value}
-                                                // error={formik.touched[inputId] && !!formik.errors[inputId]}
-                                                // helperText={formik.touched[inputId] && formik.errors[inputId]}
-                                                onBlur={onBlur}
-                                            />
-                                        </>
-
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={2}>
-                                <Controller
-                                    control={control}
-                                    name={`services.${i}.charge`}
-                                    defaultValue={x.charge}
-                                    render={({ field: { onChange, onBlur, value, ref } }) => (
-                                        <>
-
-                                            <TextField
-                                                InputLabelProps={{ shrink: true }}
-                                                // id="name"
-                                                // name="name"
-                                                label="Charge"
-                                                fullWidth
-                                                onChange={handleInputService}
-                                                value={value}
-                                                // error={formik.touched[inputId] && !!formik.errors[inputId]}
-                                                // helperText={formik.touched[inputId] && formik.errors[inputId]}
-                                                onBlur={onBlur}
-                                            />
-                                        </>
-
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                            
-                                <Controller
-                                    control={control}
-                                    name={`services.${i}.image`}
-                                     defaultValue={x.image.filename}
-                                    render={({ field: { onChange, onBlur, value, ref } }) => (
-                                        <>
-                                        {/* {x.image.filename} */}
-
-                                        
-                                         
-                                            <AntImageUpload title="image" single={true} image={x.image.filename}  multiple={false} onChange={handleInputService} value={value} />
-                                          
-                                            </>
-
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-
-                                <Button color="primary" variant="contained">Delete {x.id}</Button>
-                                <Button>Delete</Button>
-
-                            </Grid>
-                        </>
-                    })}
-                </Grid>
+           
 
                 <Grid container spacing={3}>
                     <Grid item xs={12} sm={12}>
@@ -653,9 +603,8 @@ alert(JSON.stringify(data))
                             </Grid>
                             <Grid item xs={12} sm={6}>
 
-                                {/* <Button color="primary" variant="contained">Delete {x.id}</Button>
-                                <Button>Delete</Button> */}
-
+                                 <Button color="danger" variant="contained" onClick={e => handleDelete(x.newid)}>Delete</Button>
+ 
                             </Grid>
                         </>
                     })}
